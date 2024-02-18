@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types = 1);
-
 namespace Tests\Unit\Services;
 
 use App\Services\EmailService;
@@ -12,23 +10,28 @@ use PHPUnit\Framework\TestCase;
 
 class InvoiceServiceTest extends TestCase
 {
-    /** @test */
-    public function it_processes_invoice(): void
+    public function test_it_processes_invoice()
     {
-        $salesTaxServiceMock = $this->createMock(SalesTaxService::class);
-        $gatewayServiceMock  = $this->createMock(PaymentGatewayService::class);
-        $emailServiceMock    = $this->createMock(EmailService::class);
-
-        $gatewayServiceMock->method('charge')->willReturn(true);
-
-        // given invoice service
-        $invoiceService = new InvoiceService(
-            $salesTaxServiceMock,
-            $gatewayServiceMock,
-            $emailServiceMock
+        $salesTaxServiceMock       = $this->createMock(
+            SalesTaxService::class
+        );
+        $paymentGatewayServiceMock = $this->createMock(
+            PaymentGatewayService::class
+        );
+        $emailServiceMock          = $this->createMock(
+            EmailService::class
         );
 
-        $customer = ['name' => 'Gio'];
+        $paymentGatewayServiceMock->method('charge')->willReturn(true);
+
+
+        // given [invoice service]
+        $invoiceService = new InvoiceService(
+            $salesTaxServiceMock, $paymentGatewayServiceMock, $emailServiceMock
+        );
+
+
+        $customer = ['name' => 'yoworu'];
         $amount   = 150;
 
         // when process is called
@@ -38,34 +41,32 @@ class InvoiceServiceTest extends TestCase
         $this->assertTrue($result);
     }
 
-    /** @test */
-    public function it_sends_receipt_email_when_invoice_is_processed(): void
+    public function test_it_sends_receipt_email_when_invoice_is_processed()
     {
-        $customer = ['name' => 'Gio'];
-        $salesTaxServiceMock = $this->createMock(SalesTaxService::class);
-        $gatewayServiceMock  = $this->createMock(PaymentGatewayService::class);
-        $emailServiceMock    = $this->createMock(EmailService::class);
+        $salesTaxServiceMock       = $this->createMock(
+            SalesTaxService::class
+        );
+        $paymentGatewayServiceMock = $this->createMock(
+            PaymentGatewayService::class
+        );
+        $emailServiceMock          = $this->createMock(
+            EmailService::class
+        );
+        $paymentGatewayServiceMock->method('charge')->willReturn(true);
 
-        $gatewayServiceMock->method('charge')->willReturn(true);
-
-        $emailServiceMock
-            ->expects($this->once())
-            ->method('send')
-            ->with($customer, 'receipt');
-
-        // given invoice service
-        $invoiceService = new InvoiceService(
-            $salesTaxServiceMock,
-            $gatewayServiceMock,
-            $emailServiceMock
+        $emailServiceMock->expects($this->once())->method('send')->with(
+            ['name' => 'yoworu'],
+            'receipt'
         );
 
+        $invoiceService = new InvoiceService(
+            $salesTaxServiceMock, $paymentGatewayServiceMock, $emailServiceMock
+        );
+
+        $customer = ['name' => 'yoworu'];
         $amount   = 150;
 
-        // when process is called
-        $result = $invoiceService->process($customer, $amount);
 
-        // then assert invoice is processed successfully
-        $this->assertTrue($result);
+        $invoiceService->process($customer, $amount);
     }
 }

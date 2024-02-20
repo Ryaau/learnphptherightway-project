@@ -4,23 +4,26 @@ declare(strict_types = 1);
 
 namespace Tests\Unit;
 
+use App\Container;
 use App\Exceptions\RouteNotFoundException;
 use App\Router;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
 class RouterTest extends TestCase
 {
     private Router $router;
-
+    private Container $container;
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->router = new Router();
+        $this->container = new Container();
+        $this->router    = new Router($this->container);
     }
 
-    /** @test */
-    public function it_registers_a_route(): void
+    #[Test] public function it_registers_a_route(): void
     {
         $this->router->register('get', '/users', ['Users', 'index']);
 
@@ -33,8 +36,7 @@ class RouterTest extends TestCase
         $this->assertSame($expected, $this->router->routes());
     }
 
-    /** @test */
-    public function it_registers_a_get_route(): void
+    #[Test] public function it_registers_a_get_route(): void
     {
         $this->router->get('/users', ['Users', 'index']);
 
@@ -47,8 +49,7 @@ class RouterTest extends TestCase
         $this->assertSame($expected, $this->router->routes());
     }
 
-    /** @test */
-    public function it_registers_a_post_route(): void
+    #[Test] public function it_registers_a_post_route(): void
     {
         $this->router->post('/users', ['Users', 'store']);
 
@@ -61,17 +62,12 @@ class RouterTest extends TestCase
         $this->assertSame($expected, $this->router->routes());
     }
 
-    /** @test */
-    public function there_are_no_routes_when_router_is_created(): void
+    #[Test] public function there_are_no_routes_when_router_is_created(): void
     {
-        $this->assertEmpty((new Router())->routes());
+        $this->assertEmpty((new Router($this->container))->routes());
     }
 
-    /**
-     * @test
-     * @dataProvider routeNotFoundCases
-     */
-    public function it_throws_route_not_found_exception(
+    #[DataProvider('routeNotFoundCases')] #[Test] public function it_throws_route_not_found_exception(
         string $requestUri,
         string $requestMethod
     ): void {
@@ -89,7 +85,7 @@ class RouterTest extends TestCase
         $this->router->resolve($requestUri, $requestMethod);
     }
 
-    public function routeNotFoundCases(): array
+    public static function routeNotFoundCases(): array
     {
         return [
             ['/users', 'put'],
@@ -99,8 +95,7 @@ class RouterTest extends TestCase
         ];
     }
 
-    /** @test */
-    public function it_resolves_route_from_a_closure(): void
+    #[Test] public function it_resolves_route_from_a_closure(): void
     {
         $this->router->get('/users', fn() => [1, 2, 3]);
 
@@ -110,8 +105,7 @@ class RouterTest extends TestCase
         );
     }
 
-    /** @test */
-    public function it_resolves_route(): void
+    #[Test] public function it_resolves_route(): void
     {
         $users = new class() {
             public function index(): array

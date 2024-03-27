@@ -52,8 +52,9 @@ class App
           EmailValidationServiceContract::class,
           fn() => new EmailValidationService(
             $this->config->apiKeys['abstract'],
-            new RetryMiddlewareProvider()
+            $this->container->get(RetryMiddlewareProvider::class)
           )
+
         );
 
         return $this;

@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace App\Controllers;
 
@@ -12,10 +12,12 @@ use Carbon\Carbon;
 
 class InvoiceController
 {
+
     #[Get('/invoices')]
     public function index(): View
     {
-        $invoices = Invoice::query()->where('status', InvoiceStatus::Paid)->get();
+        $invoices = Invoice::query()->where('status', InvoiceStatus::Paid)->get(
+        );
 
         return View::make('invoices/index', ['invoices' => $invoices]);
     }
@@ -32,6 +34,7 @@ class InvoiceController
 
         $invoice->save();
 
-        echo $invoice->id . ', ' . $invoice->due_date->format('m/d/Y');
+        echo $invoice->id.', '.$invoice->due_date->format('m/d/Y');
     }
+
 }

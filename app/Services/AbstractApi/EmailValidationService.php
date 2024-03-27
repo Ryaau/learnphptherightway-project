@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services\Emailable;
+namespace App\Services\AbstractApi;
 
 use App\Contracts\EmailValidationService as EmailValidationServiceContract;
 use App\Helpers\EmailValidation\RetryMiddlewareProvider;
@@ -10,12 +10,9 @@ use GuzzleHttp\HandlerStack;
 class EmailValidationService implements EmailValidationServiceContract
 {
 
-    private string $baseUrl = 'https://api.emailable.com/v1/';
+    private string $baseUrl = 'https://emailvalidation.abstractapi.com/v1/';
 
-    public function __construct(
-      protected string $apiKey,
-      protected RetryMiddlewareProvider $retryMiddlewareProvider
-    ) {}
+    public function __construct(protected string $apiKey, protected RetryMiddlewareProvider $retryMiddlewareProvider) {}
 
     public function verify(string $email): array
     {
@@ -23,9 +20,7 @@ class EmailValidationService implements EmailValidationServiceContract
 
         $maxRetriesCount = 3;
 
-        $stack->push(
-          $this->retryMiddlewareProvider->getRetryMiddleware($maxRetriesCount)
-        );
+        $stack->push($this->retryMiddlewareProvider->getRetryMiddleware($maxRetriesCount));
 
         $client = new Client([
           'base_url' => $this->baseUrl,
@@ -38,14 +33,14 @@ class EmailValidationService implements EmailValidationServiceContract
           'email'   => $email,
         ];
 
-        $url = $this->baseUrl.'verify';
-
-        $response = $client->get($url, ['query' => $params]);
+        $response = $client->get($this->baseUrl, ['query' => $params]);
 
         return json_decode(
           $response->getBody()->getContents(),
           true
         );
     }
+
+
 
 }

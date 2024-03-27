@@ -30,7 +30,8 @@ class Config
                 'dsn' => $env['MAILER_DSN'] ?? '',
             ],
             'apiKeys' => [
-              'emailable' => $env['EMAILABLE_API_KEY']
+              'emailable' => $env['EMAILABLE_API_KEY'],
+              'abstract' => $env['ABSTRACT_API_KEY'],
             ]
         ];
     }

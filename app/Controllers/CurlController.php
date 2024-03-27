@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Controllers;
 
 use App\Attributes\Get;
-use App\Services\Emailable\EmailValidationService;
+use App\Contracts\EmailValidationService;
 
 class CurlController
 {
@@ -17,7 +17,7 @@ class CurlController
     #[Get('/curl')]
     public function index()
     {
-        $email = 'a@bc.com';
+        $email = 'а.com';
 
         $result = $this->emailValidationService->verify($email);
 

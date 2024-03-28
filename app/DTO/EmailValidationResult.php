@@ -4,9 +4,9 @@ declare(strict_types = 1);
 
 namespace App\DTO;
 
-class EmailValidationResult
+readonly class EmailValidationResult
 {
-    public function __construct(public readonly int $score, public readonly bool $isDeliverable)
+    public function __construct(public int $score, public bool $isDeliverable)
     {
     }
 }
